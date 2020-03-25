@@ -105,6 +105,11 @@ public final class DropDown: UIView {
 	public weak var anchorView: AnchorView? {
 		didSet { setNeedsUpdateConstraints() }
 	}
+    
+    /// Top and bottom insets
+    public var verticalInsets: CGFloat = 0 {
+        didSet { setNeedsUpdateConstraints() }
+    }
 
 	/**
 	The possible directions where the drop down will be showed.
@@ -184,6 +189,7 @@ public final class DropDown: UIView {
 	@objc fileprivate dynamic var tableViewBackgroundColor = DPDConstant.UI.BackgroundColor {
 		willSet {
             tableView.backgroundColor = newValue
+            tableViewContainer.backgroundColor = newValue
             if arrowIndicationX != nil { arrowIndication.tintColor = newValue }
         }
 	}
@@ -549,6 +555,8 @@ private extension DropDown {
 extension DropDown {
 
 	public override func updateConstraints() {
+        tableView.contentInset = UIEdgeInsets(top: verticalInsets, left: 0, bottom: verticalInsets, right: 0)
+        
 		if !didSetupConstraints {
 			setupConstraints()
 		}
@@ -567,7 +575,7 @@ extension DropDown {
 		xConstraint.constant = layout.x
 		yConstraint.constant = layout.y
 		widthConstraint.constant = layout.width
-		heightConstraint.constant = layout.visibleHeight
+		heightConstraint.constant = layout.visibleHeight + verticalInsets * 2
 
 		tableView.isScrollEnabled = layout.offscreenHeight > 0
 
@@ -629,7 +637,7 @@ extension DropDown {
 			toItem: nil,
 			attribute: .notAnAttribute,
 			multiplier: 1,
-			constant: 0)
+			constant: verticalInsets * 2)
 		tableViewContainer.addConstraint(heightConstraint)
 
 		// Table view
